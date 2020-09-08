@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.grosen.sshShopping.categorysecond.vo.CategorySecond" table="categorySecond">
+        <id name="csid">
+            <generator class="native"></generator>
+        </id>
+        <property name="csname"/>
+
+        <many-to-one name="category" lazy="false" column="cid" class="com.grosen.sshShopping.category.vo.Category"/>
+
+    <!--    与商品的关系-->
+        <set name="products" lazy="false" fetch="join" order-by="pid" cascade="delete">
+            <key column="csid"></key>
+            <one-to-many class="com.grosen.sshShopping.product.vo.Product"></one-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.grosen.sshShopping.order.vo.Order" table="orders">
+        <id name="oid">
+            <generator class="native"></generator>
+        </id>
+        <property name="total"/>
+        <property name="ordertime"/>
+        <property name="name"/>
+        <property name="addr"/>
+        <property name="phone"/>
+        <property name="state"/>
+
+        <!--与用户是一对多关系，用户是1，订单是多-->
+        <many-to-one name="user" lazy="false" class="com.grosen.sshShopping.user.vo.User" column="uid"></many-to-one>
+
+        <!--与订单项关联-->
+        <set name="orderItems" lazy="false" cascade="save-update" order-by="itemid">
+            <key column="oid"></key>
+            <one-to-many class="com.grosen.sshShopping.order.vo.OrderItem"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

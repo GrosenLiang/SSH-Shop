@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--引入外部属性文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--配置连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--hibernate相关信息-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <!--注入连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置hibernate其他属性-->
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.connection.autocommit">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+        <!--配置hibernate映射文件-->
+        <property name="mappingResources">
+            <list>
+                <value>hbm/User.hbm.xml</value>
+                <value>hbm/Category.hbm.xml</value>
+                <value>hbm/Product.hbm.xml</value>
+                <value>hbm/CategorySecond.hbm.xml</value>
+                <value>hbm/Order.hbm.xml</value>
+                <value>hbm/OrderItem.hbm.xml</value>
+                <value>hbm/AdminUser.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--事务管理-->
+    <!--事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!--开启注解事务-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Action的类的配置-->
+    <bean id="indexAction" class="com.grosen.sshShopping.index.IndexAction" scope="prototype">
+        <property name="categoryService" ref="categoryService"/>
+        <property name="productService" ref="productService"/>
+    </bean>
+    <bean id="userAction" class="com.grosen.sshShopping.user.action.UserAction" scope="prototype">
+        <property name="userService" ref="userService"/>
+    </bean>
+    <bean id="checkImgAction" class="com.grosen.sshShopping.user.action.CheckImgAction" scope="prototype"/>
+    <bean id="productAction" class="com.grosen.sshShopping.product.action.ProductAction" scope="prototype">
+        <property name="productService" ref="productService"/>
+        <property name="categoryService" ref="categoryService"/>
+    </bean>
+    <bean id="cartAction" class="com.grosen.sshShopping.cart.action.CartAction" scope="prototype">
+        <property name="productService" ref="productService"/>
+    </bean>
+    <bean id="orderAction" class="com.grosen.sshShopping.order.action.OrderAction" scope="prototype">
+        <property name="orderService" ref="orderService"/>
+    </bean>
+    <bean id="adminUserAction" class="com.grosen.sshShopping.adminuser.action.AdminUserAction" scope="prototype">
+        <property name="adminUserService" ref="adminUserService"/>
+    </bean>
+
+    <!--后台action-->
+    <bean id="adminCategoryAction" class="com.grosen.sshShopping.category.action.AdminCategoryAction" scope="prototype">
+        <property name="categoryService" ref="categoryService"/>
+    </bean>
+    <bean id="adminCategorySecondAction" class="com.grosen.sshShopping.categorysecond.action.AdminCategorySecondAction" scope="prototype">
+        <property name="categorySecondService" ref="categorySecondService"/>
+        <property name="categoryService" ref="categoryService"/>
+    </bean>
+    <bean id="adminProductAction" class="com.grosen.sshShopping.product.action.AdminProductAction">
+        <property name="productService" ref="productService"/>
+        <property name="categorySecondService" ref="categorySecondService"/>
+    </bean>
+    <bean id="adminOrderAction" class="com.grosen.sshShopping.order.action.AdminOrderAction">
+        <property name="orderService" ref="orderService"/>
+    </bean>
+
+
+
+    <!--Service的类的配置-->
+    <bean id="userService" class="com.grosen.sshShopping.user.service.UserService">
+        <property name="userDao" ref="userDao"/>
+    </bean>
+    <bean id="categoryService" class="com.grosen.sshShopping.category.service.CategoryService">
+        <property name="categoryDAO" ref="categoryDao"/>
+    </bean>
+    <bean id="productService" class="com.grosen.sshShopping.product.service.ProductService">
+        <property name="productDao" ref="productDao"/>
+    </bean>
+    <bean id="orderService" class="com.grosen.sshShopping.order.service.OrderService">
+        <property name="orderDao" ref="orderDao"/>
+    </bean>
+    <bean id="adminUserService" class="com.grosen.sshShopping.adminuser.service.AdminUserService">
+        <property name="adminUserDao" ref="adminUserDao"/>
+    </bean>
+    <bean id="categorySecondService" class="com.grosen.sshShopping.categorysecond.service.CategorySecondService">
+        <property name="categorySecondDao"  ref="categorySecondDao"/>
+    </bean>
+
+    <!--Dao的类的配置-->
+    <bean id="userDao" class="com.grosen.sshShopping.user.dao.UserDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="categoryDao" class="com.grosen.sshShopping.category.dao.CategoryDAO">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="productDao" class="com.grosen.sshShopping.product.dao.ProductDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="orderDao" class="com.grosen.sshShopping.order.dao.OrderDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="adminUserDao" class="com.grosen.sshShopping.adminuser.dao.AdminUserDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="categorySecondDao" class="com.grosen.sshShopping.categorysecond.dao.CategorySecondDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
